@@ -11,9 +11,24 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Textarea } from '@/components/ui/textarea';
+import { chatSession } from '@/utils/GenAi';
 
 function AddNewInterview() {
     const [openDialog, setOpenDialog] = useState(false);
+    const [jobPosition, setJobPosition] = useState();
+    const [jobDescription, setJobDescription] = useState();
+    const [jobExperience, setJobExperience] = useState();
+
+
+    const onSubmit = async(e)=>{
+        e.preventDefault();
+        console.log(jobPosition, jobDescription, jobExperience);
+        const InputPrompt = "Job Position: "+jobPosition+", Job Description: +"+jobDescription+", Years of Experience: +"+jobExperience+", Depends on this information please give me  "+process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT+"Interview Questions with Answers in JSON Format, Give questions and answers as field in JSON"
+
+        const result = await chatSession.sendMessage(InputPrompt);
+
+        console.log(result.response.text());
+    }
 
     return (
         <div>
@@ -31,21 +46,24 @@ function AddNewInterview() {
                             Fill in the details below to create a new interview.
                         </DialogDescription>
                     </DialogHeader>
-                    <form>
+                    <form onSubmit={onSubmit}>
                         <div className="text-lg font-semibold mb-4">
                             Add details about your job position/role, job description, and years of experience:
                         </div>
                         <div className='mt-7 my-3'>
                             <label>Job Role/Job Position</label>
-                            <Input placeholder="Eg. Senior Software Engineer" required />
+                            <Input placeholder="Eg. Senior Software Engineer" required 
+                            onChange ={(event)=>setJobPosition(event.target.value)}/>
                         </div>
                         <div className='my-3'>
                             <label>Job Description / Tech Stack</label>
-                            <Textarea placeholder="Eg. React, DSA, Golang" required />
+                            <Textarea placeholder="Eg. React, DSA, Golang" required
+                            onChange ={(event)=>setJobDescription(event.target.value)} />
                         </div>
                         <div className='my-3'>
                             <label>Years of Experience</label>
-                            <Input placeholder="Eg. 2 Years" type="number" max="50" required/>
+                            <Input placeholder="Eg. 2 Years" type="number" max="50" required
+                            onChange ={(event)=>setJobExperience(event.target.value)}/>
                         </div>
                         <div className='flex gap-5 justify-end mt-5'>
                             <Button type="button" variant="ghost" onClick={() => setOpenDialog(false)}>Cancel</Button>
